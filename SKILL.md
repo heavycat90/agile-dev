@@ -23,10 +23,10 @@ description: "轻量级企业迭代开发方法论 — 五Agent协作（需求�
 | **需求分析Agent** | 阶段 1-2（需求分析→方案设计→分流决策） | `requirements/`、backlog 条目 |
 | **规划Agent** | 阶段 3（标准通道：从需求池选取 + Goal→Epic→Story 拆分 + 版本划分） | Plan 文件写入 `plan/to-do/`（标准通道） |
 | **交付Agent** | 阶段 4（快速通道或标准通道：实施与移交）+ 阶段 6（记录与发布） | 代码变更、Git commit |
-| **QA Agent** | 阶段 5（独立验证 + 环境管理 + 质量门禁判定） | `qa/reports/`、`qa/metrics.md`、Plan 文件移入 `plan/done/` |
+| **QA Agent** | 阶段 5（独立验证 + 环境管理 + 质量门禁判定） | `qa/reports/`、`qa/metrics.md`、`testing/test-case.md`、Plan 文件移入 `plan/done/` |
 | **PMO Agent** | 项目监控（扫描数据源，生成看板） | `pmo/dashboard.md` |
 
-需求分析Agent 与规划Agent 通过 `requirements/` 文档交接。规划Agent 和交付Agent 通过 `plan/to-do/` 队列解耦。交付Agent 和 QA Agent 通过 `plan/verify/` 队列解耦。PMO Agent 在下游消费前四者产出，独立运行。
+标准通道：需求分析Agent → 规划Agent（`requirements/` 文档交接）→ 交付Agent（`plan/to-do/` 队列）→ QA Agent（`plan/verify/` 队列）。快速通道：需求分析Agent 直接将方案要点传递给交付Agent，跳过规划Agent。PMO Agent 在下游消费前四者产出，独立运行。
 
 ## 流程文件
 
