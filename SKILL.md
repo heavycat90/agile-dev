@@ -1,10 +1,10 @@
 ---
 name: agile-dev
-version: 2.1.0
-description: "轻量级企业迭代开发方法论 — 双轨工作模型（快速通道 + 标准通道 + 需求池），双Agent协作（规划Agent + 交付Agent），通过 plan/to-do/ 队列异步协作。当用户需要进行功能迭代、需求变更、代码修改时使用。"
+version: 2.2.0
+description: "轻量级企业迭代开发方法论 — 三Agent协作（规划Agent、交付Agent、PMO Agent），双轨工作模型（快速通道 + 标准通道 + 需求池），通过 plan/to-do/ 队列异步协作。当用户需要进行功能迭代、需求变更、代码修改、查看项目状态时使用。"
 ---
 
-当用户表达以下意图时启用本 Skill：增加功能、增加业务场景、收到新需求、扩展能力、修改现有行为、调整数据结构、积累需求等。
+当用户表达以下意图时启用本 Skill：增加功能、增加业务场景、收到新需求、扩展能力、修改现有行为、调整数据结构、积累需求、查看项目状态、更新看板等。
 
 ## 双轨工作模型
 
@@ -16,23 +16,25 @@ description: "轻量级企业迭代开发方法论 — 双轨工作模型（快�
 | 🔵 **标准通道** | 中大型变更，需规划 | 分析 → 设计 → 分流 → 版本计划 → 实施 |
 | 📥 **需求池** | 暂不实施，积累打磨 | 分析 → 设计 → 分流 → 存入 backlog，后续选取 |
 
-## 双Agent协作模型
+## 三Agent协作模型
 
 | Agent | 覆盖阶段 | 产出 |
 |-------|---------|------|
 | **规划Agent** | 阶段 1-2（需求分析→方案设计→分流）+ 阶段 3（标准通道：版本计划） | Plan 文件写入 `plan/to-do/`（标准通道）；backlog 条目 |
 | **交付Agent** | 阶段 4-5（快速通道或标准通道：实施验证→记录发布） | 代码变更、Git commit |
+| **PMO Agent** | 项目监控（扫描数据源，生成看板） | `pmo/dashboard.md` |
 
-标准通道下两者通过 `plan/to-do/` 队列解耦，可并行运行（规划Agent 准备 v2 的同时交付Agent 实施 v1）。快速通道下规划Agent 完成后直接将方案要点传递给交付Agent。
+规划Agent 和交付Agent 通过 `plan/to-do/` 队列解耦。PMO Agent 在下游消费两者产出，独立运行。
 
 ## 流程文件
 
 | 文件 | 覆盖 | 归属 |
 |------|------|------|
-| `methodology.md` | 全流程总纲（双轨模型、需求池、核心哲学、目录结构、编码规范、DoD、风险管理等） | 两者共享 |
+| `methodology.md` | 全流程总纲（三Agent模型、双轨模型、需求池、核心哲学、目录结构、DoD、风险管理等） | 三者共享 |
 | `planner/analysis-and-design.md` | 阶段 1-2（需求澄清→方案设计→分流决策：快速/标准/backlog） | 规划Agent |
 | `planner/version-planning.md` | 阶段 3（标准通道：从需求池选取 + Goal→Epic→Story 拆分 + 版本划分） | 规划Agent |
 | `deliverer/implementation.md` | 阶段 4-5（快速通道 + 标准通道：实施验证→记录发布） | 交付Agent |
+| `pmo/reporting.md` | 扫描项目数据源，生成/更新 `pmo/dashboard.md` | PMO Agent |
 
 ## 新项目适配
 
@@ -43,7 +45,7 @@ description: "轻量级企业迭代开发方法论 — 双轨工作模型（快�
 ### 2. 初始化目录
 
 ```bash
-mkdir -p define/adr data/.backup requirements change-log versions plan/to-do plan/done testing/test-report sandbox
+mkdir -p define/adr data/.backup requirements change-log versions plan/to-do plan/done pmo testing/test-report sandbox
 ```
 
 ### 3. 创建初始文件
@@ -51,11 +53,13 @@ mkdir -p define/adr data/.backup requirements change-log versions plan/to-do pla
 - `requirements/requirements.md`、`requirements/scenario.md`、`requirements/backlog.md`
 - `testing/test-case.md`
 - `versions/roadmap.md`
+- `pmo/dashboard.md`（空白模板）
 - `data/enum-dictionary.json`（如项目有枚举值）
 
 ### 4. 启动迭代
 
 1. **规划Agent 会话**：描述需求变更，Skill 自动激活，从阶段 1 推进到分流决策
 2. **交付Agent 会话**：快速通道 — 规划Agent 传递方案要点直接实施；标准通道 — 从 `plan/to-do/` 拉取版本实施
+3. **PMO Agent 会话**：询问项目状态，Skill 自动激活，扫描数据源生成看板
 
-两个会话可在独立终端并行运行，互不阻塞。
+各 Agent 可在独立终端并行运行，互不阻塞。

@@ -77,6 +77,9 @@
 │   └── done/                       #   已完成的 Story Plan
 │       └── v{N}/
 │
+├── pmo/                            # PMO 项目看板
+│   └── dashboard.md                #   项目状态看板（PMO Agent 维护）
+│
 ├── testing/                        # 测试
 │   ├── test-case.md                #   测试用例定义
 │   ├── test-runner.<ext>           #   自动化测试脚本
@@ -97,7 +100,7 @@
 **本 Skill 被激活后，在进入任何阶段之前，必须先执行以下目录初始化命令。** 缺失目录会阻断后续流程（如阶段 3 无法输出 Plan 文件、阶段 4 无法备份数据）。
 
 ```bash
-mkdir -p define/adr data/.backup requirements change-log versions plan/to-do plan/done testing/test-report sandbox
+mkdir -p define/adr data/.backup requirements change-log versions plan/to-do plan/done pmo testing/test-report sandbox
 ```
 
 执行规则：
@@ -362,17 +365,21 @@ draft ──▶ refined ──▶ ready ──▶ 选取进入阶段 3 ──▶
 
 | 覆盖阶段 | Skill 文件 | 归属 Agent | 职责 |
 |---------|-----------|-----------|------|
-| 阶段 1-2 | `planner/analysis-and-design.md` | 规划Agent | 需求澄清 → 解决方案设计 |
-| 阶段 3 | `planner/version-planning.md` | 规划Agent | Goal→Epic→Story 拆分 + Release Version 划分 |
-| 阶段 4-5 | `deliverer/implementation.md` | 交付Agent | 从 `plan/to-do/` 拉取版本，按 Story 实施、验证、记录、Git 提交 |
+| 阶段 1-2 | `planner/analysis-and-design.md` | 规划Agent | 需求澄清 → 方案设计 → 分流决策 |
+| 阶段 3 | `planner/version-planning.md` | 规划Agent | 从需求池选取 + Goal→Epic→Story 拆分 + Release Version 划分 |
+| 阶段 4-5 | `deliverer/implementation.md` | 交付Agent | 快速通道或标准通道：实施验证 → 记录发布 |
+| — | `pmo/reporting.md` | PMO Agent | 扫描项目数据源，生成/更新 `pmo/dashboard.md` |
 
-> 以上文件位于本 Skill 目录下的 `planner/` 和 `deliverer/` 子目录中，与 `methodology.md` 位于同级。规划Agent 和交付Agent 分别加载对应文件执行阶段任务。
+> 以上文件位于本 Skill 目录下的 `planner/`、`deliverer/`、`pmo/` 子目录中，与 `methodology.md` 位于同级。各 Agent 分别加载对应文件执行任务。
 
 ---
 
-## 双Agent协作模型
+## 三Agent协作模型
 
-传统串行流程（需求→方案→计划→实施→发布）在实际产品开发中存在瓶颈：规划和实施互相阻塞。引入 AI 后，可将"计划"与"实施"解耦为两个独立 Agent，通过 `plan/to-do/` 队列异步协作。
+传统串行流程（需求→方案→计划→实施→发布）在实际产品开发中存在瓶颈：规划和实施互相阻塞。引入 AI 后，将"计划""实施""监控"拆分为三个独立 Agent：
+
+- **规划Agent** 与 **交付Agent** 通过 `plan/to-do/` 队列异步协作
+- **PMO Agent** 消费两者的产出物，生成项目状态看板
 
 ### 架构
 
@@ -388,37 +395,57 @@ draft ──▶ refined ──▶ ready ──▶ 选取进入阶段 3 ──▶
   │ define/      │                       │ 产出:        │
   │ requirements/│                       │ src/         │
   │ testing/     │                       │ data/        │
-  │ plan/to-do/  │                       │ Git commit   │
-  └──────────────┘                       └──────────────┘
-       ▲                                       ▲
-       │                                       │
+  │ plan/to-do/  │                       │ plan/done/   │
+  └──────────────┘                       │ versions/    │
+       ▲                                 │ change-log/  │
+       │                                 │ Git commit   │
+       │                                 └──────┬───────┘
+       │                                        │
   门禁 1-3                                门禁 4-5
+       │                                        │
+       │          ┌──────────────┐              │
+       │          │ PMO Agent    │              │
+       │          │  (监控)       │◀─────────────┘
+       │          │              │
+       │          │ 只读扫描:     │
+       └─────────▶│ requirements/ │
+                  │ plan/to-do/  │
+                  │ plan/done/   │
+                  │ versions/    │
+                  │ change-log/  │
+                  │              │
+                  │ 产出:        │
+                  │ pmo/         │
+                  │ dashboard.md │
+                  └──────────────┘
 ```
 
 ### 职责边界
 
-| 维度 | 规划Agent | 交付Agent |
-|------|----------|----------|
-| **范围** | 阶段 1-3（需求分析、方案设计、版本计划） | 阶段 4-5（实施验证、记录发布） |
-| **可写** | `define/`、`requirements/`、`testing/`、`plan/to-do/`、`versions/`、`data/enum-dictionary.json`（枚举字典） | 源码目录、`data/`（业务数据）、`data/.backup/`、`plan/done/`、`change-log/`、`CLAUDE.md` |
-| **只读** | 源码目录、`data/<业务数据文件>`（作为现状参考） | `define/`、`requirements/`、`testing/`（作为实施依据） |
-| **禁止碰** | 源码目录的代码实现；`data/` 中业务数据的修改 | `define/` 的数据结构定义；`requirements/` 的需求文档 |
-| **门禁** | 门禁 1、2、3 | 门禁 4、5 |
+| 维度 | 规划Agent | 交付Agent | PMO Agent |
+|------|----------|----------|-----------|
+| **范围** | 阶段 1-3（需求分析、方案设计、版本计划） | 阶段 4-5（实施验证、记录发布） | 项目状态监控、看板维护 |
+| **可写** | `define/`、`requirements/`、`testing/`、`plan/to-do/`、`versions/`、`data/enum-dictionary.json` | 源码目录、`data/`（业务数据）、`data/.backup/`、`plan/done/`、`change-log/`、`CLAUDE.md` | `pmo/dashboard.md` |
+| **只读** | 源码目录、`data/<业务数据文件>` | `define/`、`requirements/`、`testing/` | `requirements/`、`plan/to-do/`、`plan/done/`、`versions/`、`change-log/` |
+| **禁止碰** | 源码目录的代码实现；`data/` 中业务数据的修改 | `define/` 的数据结构定义；`requirements/` 的需求文档 | `define/`、`data/`、源码目录、`CLAUDE.md` |
+| **门禁** | 门禁 1、2、3 | 门禁 4、5 | 无（纯报表职能） |
 
 ### 协作模式
 
 - **规划先行**：规划Agent 提前完成阶段 1-3，将 Plan 文件写入 `plan/to-do/v{N}/`，不等待交付Agent
 - **异步交付**：交付Agent 从 `plan/to-do/` 拉取待实施版本，按 Story 逐个实施，完成后移动到 `plan/done/`
 - **并行推进**：交付Agent 实施 v1 的同时，规划Agent 可以准备 v2 甚至 v3 的计划
+- **下游监控**：PMO Agent 在两者产出后独立运行，扫描所有数据源生成看板
 - **队列驱动**：`plan/to-do/` 是唯一交接面，规划Agent 只负责写，交付Agent 只负责读+消费
 
 ### 跨Agent一致性保证
 
-定义层 → 数据层 → 代码层 → 测试层 四层在双Agent模型下被拆分到两个 Agent 手中。一致性通过 `plan/to-do/` 中的 Plan 文件作为**契约**来保证：
+定义层 → 数据层 → 代码层 → 测试层 四层在 Agent 模型下被拆分。一致性通过 `plan/to-do/` 中的 Plan 文件作为**契约**来保证：
 
 - **规划Agent** 在 Plan 文件中明确定义变更目标：数据结构、字段、枚举值、测试用例编号
 - **交付Agent** 按 Plan 文件的契约实施代码和数据层，不自行偏离
 - 交付Agent 实施时发现 Plan 无法落地，应暂停并反馈规划Agent 修订后继续
+- **PMO Agent** 不参与契约，仅消费最终产出
 
 ### 版本号分配
 
@@ -426,18 +453,19 @@ draft ──▶ refined ──▶ ready ──▶ 选取进入阶段 3 ──▶
 
 ### 启动方式
 
-两个 Agent 通过独立的 Claude Code 会话并行运行：
+三个 Agent 通过独立的 Claude Code 会话并行运行：
 
 1. **规划Agent**：用户说明新需求，Skill `agile-dev` 自动激活，从阶段 1 推进到阶段 3，产出 Plan 文件
-2. **交付Agent**：用户指定要交付的版本号，Skill `agile-dev` 自动激活，从阶段 4 开始消费 `plan/to-do/`
+2. **交付Agent**：用户指定要交付的版本号或小变更，Skill `agile-dev` 自动激活，从阶段 4 开始
+3. **PMO Agent**：用户询问项目状态或版本发布后，Skill `agile-dev` 自动激活，生成/更新看板
 
-> 实际操作：开两个终端窗口，一个跑规划、一个跑交付，互不阻塞。
+> 实际操作：开多个终端窗口，规划、交付、PMO 在各自会话中独立运行，互不阻塞。
 
 ---
 
 ## 角色定义
 
-即便是单人项目，也需在迭代过程中切换以下角色视角，确保多维度思考。两个 Agent 可在独立会话中并行运行。
+即便是单人项目，也需在迭代过程中切换以下角色视角，确保多维度思考。三个 Agent 可在独立会话中并行运行。
 
 ### 职能角色
 
@@ -449,6 +477,7 @@ draft ──▶ refined ──▶ ready ──▶ 选取进入阶段 3 ──▶
 | **开发者（Dev）** | 方案设计、编码实现 | 阶段 2（规划Agent）、4（交付Agent） |
 | **质量保证（QA）** | 定义测试用例、执行验证、质量门禁 | 阶段 1（定义用例）、4（执行验证） |
 | **运维（Ops）** | 数据安全、向后兼容、发布记录 | 阶段 4、5（交付Agent） |
+| **PMO** | 项目状态汇总、看板维护、异常预警 | 阶段 5 完成后（自动）、按需（PMO Agent） |
 
 > 角色冲突警示：当同一个决策从 PO 视角看合理，但从 Dev 视角看有隐患时，必须优先考虑数据安全和向后兼容原则。
 
@@ -489,6 +518,20 @@ draft ──▶ refined ──▶ ready ──▶ 选取进入阶段 3 ──▶
 - 定向验证：受影响用例 **100% 通过**
 - 冒烟测试：全量用例 **100% 通过**（0 失败，0 错误）
 - 回归验证：至少一个正向场景和边界场景手动确认
+
+### 沙箱隔离（硬规则）
+
+> **任何涉及数据写入的验证操作，必须在沙箱环境执行，禁止对生产数据文件进行手动测试。**
+
+此规则适用于所有角色（规划Agent、交付Agent、开发者手动验证）：
+
+| 验证类型 | ✅ 正确做法 | ❌ 禁止 |
+|---------|------------|--------|
+| **API / 表单验证** | 使用项目提供的 `--sandbox` 参数启动隔离 API 实例 | 对生产 API 端口直接执行写入操作 |
+| **CLI 验证** | 运行 `testing/test-runner.py`（自动沙箱隔离） | 直接执行 `scripts/mgr.py` 命令做临时验证 |
+| **数据文件** | 在 `sandbox/data/` 中操作测试数据 | 修改 `data/` 目录下的生产 JSON 文件 |
+
+违规即视为流程事故，需清理生产数据中的测试残留并记录回顾。
 
 ---
 
