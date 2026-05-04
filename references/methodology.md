@@ -8,7 +8,7 @@
 
 ## 核心哲学与设计原则
 
-五条核心价值观与编码规范、测试策略定义在 [`references/design-principles.md`](references/design-principles.md)。所有 Agent 实施时以此为唯一标准。
+五条核心价值观与编码规范、测试策略定义在 [`design-principles.md`](design-principles.md)。所有 Agent 实施时以此为唯一标准。
 
 ---
 
@@ -364,12 +364,12 @@ draft ──▶ refined ──▶ ready ──▶ 选取进入阶段 3 ──▶
 
 | 覆盖阶段 | Skill 文件 | 归属 Agent | 职责 |
 |---------|-----------|-----------|------|
-| 阶段 1-2 | `planner/analysis-and-design.md` | 规划Agent | 需求澄清 → 方案设计 → 分流决策 |
-| 阶段 3 | `planner/version-planning.md` | 规划Agent | 从需求池选取 + Goal→Epic→Story 拆分 + Release Version 划分 |
-| 阶段 4-5 | `deliverer/implementation.md` | 交付Agent | 快速通道或标准通道：实施验证 → 记录发布 |
-| — | `pmo/reporting.md` | PMO Agent | 扫描项目数据源，生成/更新 `pmo/dashboard.md` |
+| 阶段 1-2 | `analysis-and-design.md` | 规划Agent | 需求澄清 → 方案设计 → 分流决策 |
+| 阶段 3 | `version-planning.md` | 规划Agent | 从需求池选取 + Goal→Epic→Story 拆分 + Release Version 划分 |
+| 阶段 4-5 | `implementation.md` | 交付Agent | 快速通道或标准通道：实施验证 → 记录发布 |
+| — | `reporting.md` | PMO Agent | 扫描项目数据源，生成/更新 `pmo/dashboard.md` |
 
-> 以上文件位于本 Skill 目录下的 `planner/`、`deliverer/`、`pmo/` 子目录中，与 `methodology.md` 位于同级。各 Agent 分别加载对应文件执行任务。
+> 以上文件位于本 Skill 目录下的 `references/` 子目录中。各 Agent 分别加载对应文件执行任务。
 
 ---
 
@@ -484,15 +484,15 @@ draft ──▶ refined ──▶ ready ──▶ 选取进入阶段 3 ──▶
 
 ## 贯穿标准
 
-编码规范、设计原则、测试策略、沙箱隔离规则见 [`references/design-principles.md`](references/design-principles.md)。
+编码规范、设计原则、测试策略、沙箱隔离规则见 [`design-principles.md`](design-principles.md)。
 
 ## 定义完成（DoD）与质量度量
 
-各层级完成标准和质量指标见 [`references/dod-and-qa.md`](references/dod-and-qa.md)。
+各层级完成标准和质量指标见 [`dod-and-qa.md`](dod-and-qa.md)。
 
 ## 风险管理与异常流程
 
-风险管理框架、ADR、Hotfix、回滚策略、禁止事项见 [`references/risk-and-exceptions.md`](references/risk-and-exceptions.md)。
+风险管理框架、ADR、Hotfix、回滚策略、禁止事项见 [`risk-and-exceptions.md`](risk-and-exceptions.md)。
 
 ---
 

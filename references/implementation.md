@@ -8,7 +8,7 @@
 > - **标准通道**：`plan/to-do/v{N}/` 目录下已有 Story Plan 文件（门禁 3 已通过）
 > - **快速通道**：阶段 2 分流决策后，规划Agent 已将方案要点直接传递过来
 >
-> 贯穿标准：编码规范、设计原则、测试策略已统一定义在 `../references/design-principles.md`，本阶段严格遵循。
+> 贯穿标准：编码规范、设计原则、测试策略已统一定义在 `design-principles.md`，本阶段严格遵循。
 
 ---
 
@@ -40,7 +40,7 @@
 
 1. 实施前备份受影响的 `data/` 文件到 `data/.backup/`
 2. 按方案要点逐项实施代码变更
-3. 遵循 `../references/design-principles.md` 设计原则和项目 `CLAUDE.md` 编码规范
+3. 遵循 `design-principles.md` 设计原则和项目 `CLAUDE.md` 编码规范
 
 **实施后代码自审**（快速通道版）：
 
@@ -236,13 +236,13 @@
 
 ### 5.5 轻量回顾
 
-Git commit 完成后，立即执行轻量回顾（见 `../methodology.md` 持续改进章节）：
+Git commit 完成后，立即执行轻量回顾（见 `methodology.md` 持续改进章节）：
 
 1. What went well?
 2. What was painful?
 3. What to change?
 
-回顾结论写入变更记录末尾。若改进建议涉及方法论本身，立即修订 `../methodology.md` 或相关 Skill 文件。
+回顾结论写入变更记录末尾。若改进建议涉及方法论本身，立即修订 `methodology.md` 或相关 Skill 文件。
 
 ---
 

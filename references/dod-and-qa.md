@@ -18,7 +18,7 @@
 - [ ] `CLAUDE.md` 已更新
 - [ ] 变更记录已写入 `change-log/`
 - [ ] Git commit 已创建，message 格式 `v{版本号}: {简短描述}`
-- [ ] 轻量回顾已完成（见 `../methodology.md` 持续改进章节）
+- [ ] 轻量回顾已完成（见 `methodology.md` 持续改进章节）
 
 ### Iteration 级 DoD
 
