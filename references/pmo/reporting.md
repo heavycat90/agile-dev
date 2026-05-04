@@ -1,6 +1,6 @@
 # PMO 项目看板
 
-> 第三Agent（PMO 专用）：扫描项目标准目录中的数据文件，聚合生成项目状态看板。
+> 第五Agent（PMO 专用）：扫描项目标准目录中的数据文件，聚合生成项目状态看板。
 >
 > PMO Agent 的定位是项目观察者——只读扫描，只写看板，不参与需求/设计/编码/测试的任何环节。
 
@@ -10,7 +10,7 @@
 |------|------|
 | **定位** | 产品与项目管理办公室（PMO），负责项目状态汇总与可视化 |
 | **可写** | 仅 `pmo/dashboard.md` |
-| **只读** | `requirements/backlog.md`、`plan/to-do/`、`plan/done/`、`versions/roadmap.md`、`versions/v*.md`、`change-log/` |
+| **只读** | `requirements/backlog.md`、`plan/to-do/`、`plan/verify/`、`plan/done/`、`qa/metrics.md`、`versions/roadmap.md`、`versions/v*.md`、`change-log/` |
 | **禁止碰** | `define/`、`data/`、源码目录、`CLAUDE.md` |
 | **门禁** | 无（纯报表职能） |
 
@@ -18,7 +18,7 @@
 
 PMO Agent 在以下两种情况下激活：
 
-1. **版本发布触发**：交付Agent 完成阶段 5（Git commit 已创建）后，提示用户可更新看板。用户确认后 PMO Agent 执行更新
+1. **版本发布触发**：交付Agent 完成阶段 6（Git commit 已创建）后，提示用户可更新看板。用户确认后 PMO Agent 执行更新
 2. **按需触发**：用户主动要求，如"查看项目状态""更新看板""项目进度怎么样""pmo"。PMO Agent 直接扫描数据源并汇报
 
 ## 数据源与读取方式
@@ -39,6 +39,10 @@ PMO Agent 在以下两种情况下激活：
 
 扫描各版本目录，统计 `.md` 文件数作为「进行中 Story」数量.列出每个 Story 的标题和所属 Epic.
 
+### plan/verify/v{N}/
+
+扫描各版本目录，统计 `.md` 文件数作为「待 QA 验证 Story」数量。
+
 ### plan/done/v{N}/
 
 统计所有已完成 Story 数量.
@@ -57,6 +61,15 @@ PMO Agent 在以下两种情况下激活：
 ### change-log/
 
 统计最近 5 个版本的测试通过率和回顾记录.
+
+### qa/metrics.md
+
+读取 QA 质量度量数据，提取：
+- 最近版本的定向验证通过率
+- 冒烟测试通过率
+- 安全测试发现数量
+- 压力测试结果
+- 验证周期
 
 ---
 
@@ -96,6 +109,7 @@ PMO Agent 在以下两种情况下激活：
 |------|------|
 | 需求池总量 | N |
 | 进行中 Story | N |
+| 待 QA 验证 Story | N |
 | 累计已完成 Story | N |
 | 已发布版本 | N |
 | 最新版本 | v{x.y.z} (YYYY-MM-DD) |
@@ -128,6 +142,15 @@ PMO Agent 在以下两种情况下激活：
 > 若 ready 为空，显示「当前无 ready 条目。需求池中还有 N 条 refined 条目待确认。」
 
 ## 当前进度
+
+### QA 验证中（plan/verify/）
+
+**v{N}**:
+| Story | 所属 Epic |
+|-------|----------|
+| E1-S1: {标题} | Epic 1: {标题} |
+
+> 若 plan/verify/ 为空，显示「当前无待 QA 验证 Story。」
 
 ### 进行中（plan/to-do/）
 
@@ -167,6 +190,7 @@ PMO Agent 扫描数据源后，检查以下条件，满足则在看板顶部附�
 |------|---------|------|
 | 需求池枯竭 | ready + refined = 0 | `⚠️ 需求池无可排期条目。建议尽快补充需求分析。` |
 | WIP 堆积 | plan/to-do/ 中 Story 总数 > 6 | `⚠️ 进行中 Story 过多（> 6），交付Agent 可能过载。` |
+| QA 验证积压 | plan/verify/ 中 Story 数 > 3 且持续超过 24h | `⚠️ QA 验证积压（> 3 个 Story 等待验证超过 24h），建议优先处理。` |
 | 长期僵死 | 存在 draft 条目，`创建日期` 距今 > 30 天 | `⚠️ 需求池存在长期未处理的 draft 条目：B-xxx（创建于 YYYY-MM-DD）。` |
 | 无进行中 | plan/to-do/ 为空，但 backlog 有 ready 条目 | `ℹ️ 有 N 条 ready 条目待排期，可启动下一版本规划。` |
 
@@ -176,15 +200,22 @@ PMO Agent 扫描数据源后，检查以下条件，满足则在看板顶部附�
 
 ## 与双轨模型的关系
 
-PMO Agent 不参与分流决策，不实施代码，不修改需求和定义。它只消费规划和交付的产出：
+PMO Agent 不参与分流决策，不实施代码，不修改需求和定义。它只消费者需求分析、规划、交付和 QA 的产出：
 
 ```
-规划Agent ──▶ requirements/backlog.md
-                     requirements/requirements.md
-                     plan/to-do/v{N}/
+需求分析Agent ──▶ requirements/backlog.md
+                         requirements/requirements.md
                               │
-交付Agent ──▶ plan/done/v{N}/
-                     versions/roadmap.md
+规划Agent ──▶ plan/to-do/v{N}/
+                              │
+交付Agent ──▶ plan/verify/v{N}/
+                              │
+QA Agent  ──▶ plan/done/v{N}/
+                     qa/reports/
+                     qa/metrics.md
+                     testing/test-case.md
+                              │
+交付Agent ──▶ versions/roadmap.md
                      versions/v{x.y.z}.md
                      change-log/
                               │
