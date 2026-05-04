@@ -32,9 +32,9 @@ description: "轻量级企业迭代开发方法论 — 双Agent协作模型（�
 | 文件 | 覆盖阶段 | 归属 Agent |
 |------|---------|-----------|
 | `methodology.md` | 全流程总纲（核心哲学、目录结构、编码规范、测试策略、风险管理、DoD 等） | 两者共享 |
-| `需求分析与方案设计.md` | 阶段 1-2（需求澄清→方案设计） | 规划Agent |
-| `制订方案实施版本计划.md` | 阶段 3（Goal→Epic→Story 拆分 + 版本划分） | 规划Agent |
-| `版本实施与发布.md` | 阶段 4-5（实施验证→记录发布） | 交付Agent |
+| `planner/analysis-and-design.md` | 阶段 1-2（需求澄清→方案设计） | 规划Agent |
+| `planner/version-planning.md` | 阶段 3（Goal→Epic→Story 拆分 + 版本划分） | 规划Agent |
+| `deliverer/implementation.md` | 阶段 4-5（实施验证→记录发布） | 交付Agent |
 
 ## 项目适配指南
 

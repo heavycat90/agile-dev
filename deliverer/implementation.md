@@ -6,7 +6,7 @@
 >
 > 前置：`plan/to-do/v{N}/` 目录下已有规划Agent 产出的 Story Plan 文件（门禁 3 已通过）。
 >
-> 贯穿标准：编码规范、设计原则、测试策略已统一定义在 `methodology.md`，本阶段严格遵循。
+> 贯穿标准：编码规范、设计原则、测试策略已统一定义在 `../methodology.md`，本阶段严格遵循。
 
 ---
 
@@ -176,13 +176,13 @@
 
 ### 5.5 轻量回顾
 
-Git commit 完成后，立即执行轻量回顾（见 `methodology.md` 持续改进章节）：
+Git commit 完成后，立即执行轻量回顾（见 `../methodology.md` 持续改进章节）：
 
 1. What went well?
 2. What was painful?
 3. What to change?
 
-回顾结论写入变更记录末尾。若改进建议涉及方法论本身，立即修订 `methodology.md` 或相关 Skill 文件。
+回顾结论写入变更记录末尾。若改进建议涉及方法论本身，立即修订 `../methodology.md` 或相关 Skill 文件。
 
 ---
 

@@ -222,11 +222,11 @@ mkdir -p define/adr data/.backup requirements change-log versions plan/to-do pla
 
 | 覆盖阶段 | Skill 文件 | 归属 Agent | 职责 |
 |---------|-----------|-----------|------|
-| 阶段 1-2 | `需求分析与方案设计.md` | 规划Agent | 需求澄清 → 解决方案设计 |
-| 阶段 3 | `制订方案实施版本计划.md` | 规划Agent | Goal→Epic→Story 拆分 + Release Version 划分 |
-| 阶段 4-5 | `版本实施与发布.md` | 交付Agent | 从 `plan/to-do/` 拉取版本，按 Story 实施、验证、记录、Git 提交 |
+| 阶段 1-2 | `planner/analysis-and-design.md` | 规划Agent | 需求澄清 → 解决方案设计 |
+| 阶段 3 | `planner/version-planning.md` | 规划Agent | Goal→Epic→Story 拆分 + Release Version 划分 |
+| 阶段 4-5 | `deliverer/implementation.md` | 交付Agent | 从 `plan/to-do/` 拉取版本，按 Story 实施、验证、记录、Git 提交 |
 
-> 以上文件与本文件（`methodology.md`）位于同一 Skill 目录下。规划Agent 和交付Agent 分别加载对应文件执行阶段任务。
+> 以上文件位于本 Skill 目录下的 `planner/` 和 `deliverer/` 子目录中，与 `methodology.md` 位于同级。规划Agent 和交付Agent 分别加载对应文件执行阶段任务。
 
 ---
 
