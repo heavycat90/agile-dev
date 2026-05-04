@@ -34,10 +34,10 @@ description: "轻量级企业迭代开发方法论 — 三Agent协作（规划Ag
 | `references/design-principles.md` | 核心哲学、编码规范、设计原则、测试策略、沙箱隔离 | 三者共享 |
 | `references/dod-and-qa.md` | 定义完成（DoD）、质量度量指标 | 交付Agent、PMO Agent |
 | `references/risk-and-exceptions.md` | 风险管理、ADR、Hotfix、回滚策略、禁止事项 | 三者共享 |
-| `references/analysis-and-design.md` | 阶段 1-2（需求澄清→方案设计→分流决策：快速/标准/backlog） | 规划Agent |
-| `references/version-planning.md` | 阶段 3（标准通道：从需求池选取 + Goal→Epic→Story 拆分 + 版本划分） | 规划Agent |
-| `references/implementation.md` | 阶段 4-5（快速通道 + 标准通道：实施验证→记录发布） | 交付Agent |
-| `references/reporting.md` | 扫描项目数据源，生成/更新 `pmo/dashboard.md` | PMO Agent |
+| `references/planner/analysis-and-design.md` | 阶段 1-2（需求澄清→方案设计→分流决策：快速/标准/backlog） | 规划Agent |
+| `references/planner/version-planning.md` | 阶段 3（标准通道：从需求池选取 + Goal→Epic→Story 拆分 + 版本划分） | 规划Agent |
+| `references/deliverer/implementation.md` | 阶段 4-5（快速通道 + 标准通道：实施验证→记录发布） | 交付Agent |
+| `references/pmo/reporting.md` | 扫描项目数据源，生成/更新 `pmo/dashboard.md` | PMO Agent |
 
 ## 新项目适配
 

@@ -364,12 +364,12 @@ draft ──▶ refined ──▶ ready ──▶ 选取进入阶段 3 ──▶
 
 | 覆盖阶段 | Skill 文件 | 归属 Agent | 职责 |
 |---------|-----------|-----------|------|
-| 阶段 1-2 | `analysis-and-design.md` | 规划Agent | 需求澄清 → 方案设计 → 分流决策 |
-| 阶段 3 | `version-planning.md` | 规划Agent | 从需求池选取 + Goal→Epic→Story 拆分 + Release Version 划分 |
-| 阶段 4-5 | `implementation.md` | 交付Agent | 快速通道或标准通道：实施验证 → 记录发布 |
-| — | `reporting.md` | PMO Agent | 扫描项目数据源，生成/更新 `pmo/dashboard.md` |
+| 阶段 1-2 | `planner/analysis-and-design.md` | 规划Agent | 需求澄清 → 方案设计 → 分流决策 |
+| 阶段 3 | `planner/version-planning.md` | 规划Agent | 从需求池选取 + Goal→Epic→Story 拆分 + Release Version 划分 |
+| 阶段 4-5 | `deliverer/implementation.md` | 交付Agent | 快速通道或标准通道：实施验证 → 记录发布 |
+| — | `pmo/reporting.md` | PMO Agent | 扫描项目数据源，生成/更新 `pmo/dashboard.md` |
 
-> 以上文件位于本 Skill 目录下的 `references/` 子目录中。各 Agent 分别加载对应文件执行任务。
+> 以上文件位于本 Skill 目录下的 `references/planner/`、`references/deliverer/`、`references/pmo/` 子目录中，与 `methodology.md` 等位于 `references/` 下。各 Agent 分别加载对应文件执行任务。
 
 ---
 
