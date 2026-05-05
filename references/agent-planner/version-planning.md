@@ -1,12 +1,12 @@
 # 制订方案实施版本计划
 
-> 迭代开发流程第三步（规划Agent专用，标准通道）：扫描需求池，选取条目，将解决方案拆解为可独立交付的 Story，按 Release Version 组织版本计划。
+> 规划Agent 专用：扫描 `requirements/backlog/`，选取 ready 条目，将解决方案拆解为可独立交付的 Story，按 Release Version 组织版本计划，回写 `requirements/requirements.md` 和 `requirements/scenario.md`。
 >
-> 本文件由规划Agent使用。规划Agent负责阶段 3（版本计划），产出 Plan 文件到 `plan/to-do/`，不修改源码。
+> 本文件由规划Agent使用。规划Agent负责版本计划，产出 Plan 文件到 `plan/to-do/`，回写版本化需求文档，不修改源码。
 >
-> 前置：需求分析Agent 已完成阶段 1-2（需求分析 + 方案设计 + 分流决策），判定为「标准通道」。
+> 前置：已读取根目录 `project-basic.md` 了解最新项目状态。需求分析Agent 已完成需求分析与方案设计，判定为「标准通道」。
 >
-> 贯穿标准：编码规范、设计原则、测试策略已统一定义在 `../design-principles.md`，本阶段严格遵循。
+> 贯穿标准：编码规范、设计原则、测试策略已统一定义在 `../governance/design-principles.md`，严格遵循。
 
 ---
 
@@ -14,29 +14,29 @@
 
 | 维度 | 说明 |
 |------|------|
-| **定位** | 版本规划（Planner），负责从需求池选取、Goal→Epic→Story 拆分、Release Version 划分 |
-| **可写** | `plan/to-do/`、`versions/` |
-| **只读** | `requirements/`、`testing/`、`define/`、`requirements/backlog.md` |
+| **定位** | 版本规划（Planner），负责从需求池选取、Goal→Epic→Story 拆分、Release Version 划分、回写版本化需求文档 |
+| **可写** | `plan/to-do/`、`versions/`、`requirements/requirements.md`、`requirements/scenario.md` |
+| **只读** | `requirements/backlog/`、`define/`、`function-testing/` |
 | **禁止碰** | 源码目录的代码实现 |
 | **门禁** | 门禁 3（计划确认） |
 
 ---
 
-## 阶段 3：制订方案实施计划
+## 版本计划
 
 ### 3.0 从需求池选取
 
-在拆解当前需求之前，先扫描 `requirements/backlog.md` 中状态为 `ready` 的条目。这些是已经过完整分析、待排期的需求。
+扫描 `requirements/backlog/` 目录下所有 `status: ready` 的条目文件。这些是已经过完整分析、待排期的需求。
 
-1. **扫描 backlog** — 读取 `requirements/backlog.md`，列出所有 `状态: ready` 的条目
-2. **匹配关联** — 检查 ready 条目中是否有与当前需求关联的需求（如同一业务域、存在依赖关系等）
-3. **提议合并** — 向用户提议：
-   - 当前需求单独进入版本计划
-   - 或与关联的 backlog ready 条目合并为同一版本
+1. **扫描 backlog 目录** — 列出 `requirements/backlog/` 下所有 frontmatter 中 `status: ready` 的文件
+2. **匹配关联** — 检查 ready 条目中是否有相互关联的需求（如同一业务域、存在依赖关系等）
+3. **提议选取** — 向用户展示 ready 清单，建议：
+   - 本次版本包含哪些条目
+   - 哪些条目因关联关系建议合并
    - 给用户选择权，不自动决定
-4. **确认选取** — 用户确认后，将选中条目标记为 `done`（注明版本号），进入 3.1 拆解
+4. **确认选取** — 用户确认后，将选中条目的 `status` 更新为 `planned`，`version` 字段填入本次版本号，进入 3.1 拆解
 
-> 若 backlog 中无 ready 条目，或用户选择不合并，则仅以当前需求进入 3.1。
+> 若 backlog 中无 ready 条目，则告知用户暂无待排期需求。
 
 ### 3.1 Goal → Epic → Story 拆解
 
@@ -57,8 +57,19 @@
 Epic 内某个角色的完整 E2E 业务场景。拆分标准：
 - 从用户视角出发，描述一个端到端的操作流程
 - 每个 Story 是一个子目标，可独立实施、独立验证、独立交付
-- 每个 Story 对应 `requirements/scenario.md` 中的一个或多个场景
-- 每个 Story 对应 `testing/test-case.md` 中对应的测试用例
+- 每个 Story 对应一个或多个业务场景，场景内容取自各 backlog 文件的「验收标准」，由规划Agent 在拆解时统一分配场景编号（S-NN，跨版本延续）
+- 每个 Story 对应 `function-testing/test-case.md` 中对应的测试用例
+
+**不好的 Story（应进一步拆分）**：
+
+| 反例 | 问题 | 应拆为 |
+|------|------|--------|
+| "实现用户管理模块" | 范围过宽，包含 CRUD + 权限 + 界面 | 创建用户、编辑用户、删除用户、权限校验 各为独立 Story |
+| "优化数据库查询 + 新增导出功能" | 混合两个不相关目标 | 查询优化、导出功能 各为独立 Story |
+| "统一修改所有命令的错误提示格式" | 跨多个不相关命令，无法独立验证 | 按命令逐一拆分为独立 Story |
+| "重构数据访问层" | 从用户视角不可见，无法用 GWT 描述验收 | 以用户可见的功能变化为粒度拆分 |
+
+**判断标准**：一个 Story 能否用一个 GWT 场景完整描述验收？能 → 粒度合适。不能（需要多个 GWT 覆盖不同操作）→ 进一步拆分。
 
 #### 示例拆解
 
@@ -256,13 +267,72 @@ Plan 文件输出完成后，为本次迭代涉及的所有 Release Version 创�
 {如有破坏性变更或需要手动操作，在此说明；若为纯新增功能，写「无需额外操作」}
 ```
 
-> 阶段 3 创建此文件时，发布日期暂填「计划中」；阶段 6 发布时更新为实际日期。
+> 规划Agent 创建此文件时，发布日期暂填「计划中」；交付Agent 发布时更新为实际日期。
+
+### 3.10 回写版本化需求文档
+
+Plan 文件输出完成后，将本次版本包含的需求回写到需求文档。
+
+#### 3.10.1 更新 `requirements/requirements.md`
+
+按版本组织，记录每个版本包含的 backlog 条目：
+
+```markdown
+# 需求总览
+
+## v1.2.0 — 供应商信息扩展 + 合同模板管理
+**规划日期**: 2026-05-05
+**条目**:
+- [BL-20260505-0001](backlog/BL-20260505-0001.md) — 供应商信息扩展 `[data-export]`
+- [BL-20260505-0002](backlog/BL-20260505-0002.md) — 合同模板管理 `[contract-core]`
+
+## v1.1.0 — 批量导入导出
+...
+```
+
+条目行末尾的 `` `[initiative]` `` 标签为可选：仅当对应 backlog 文件的 frontmatter 中 `initiative` 字段非空时才标注。
+
+**若存在 initiative 标签**，在文件末尾追加「主题索引」：
+
+```markdown
+## 主题索引
+
+| 主题 | 版本 | 状态 |
+|------|------|------|
+| `data-export` | v1.2.0, v1.3.0, v1.4.0 | 进行中 |
+| `auth-system` | v1.0.0, v1.1.0 | 已完成 |
+| `contract-core` | v1.2.0 | 进行中 |
+```
+
+> 主题索引由规划Agent 在每次写入 `requirements.md` 时全量重算：扫描所有 backlog 文件中的 `initiative` 字段，按值聚合，列出涉及版本。状态取该主题最新版本的状态（`计划中` / `进行中` / `已完成`）。若项目中无任何条目使用 `initiative`，则省略此节。
+
+> 首次使用时创建该文件，后续版本在文件顶部插入新版本条目。
+
+#### 3.10.2 更新 `requirements/scenario.md`
+
+将本次版本涉及的场景（已在 3.1 拆解时分配编号）汇总写入 `requirements/scenario.md`：
+
+```markdown
+# 业务场景汇总
+
+## v1.2.0
+
+### S-01: 供应商扩展信息录入
+**来源**: [BL-20260505-0001](backlog/BL-20260505-0001.md)
+**Given** ... **When** ... **Then** ...
+
+### S-02: 供应商信息查询
+**来源**: [BL-20260505-0001](backlog/BL-20260505-0001.md)
+**Given** ... **When** ... **Then** ...
+```
+
+> 场景编号 `S-NN`（两位数字），跨版本延续。编号规则：扫描 `requirements/scenario.md` 中已有场景编号，取最大值 +1 作为新场景起始编号。若文件不存在（首次使用），从 `S-01` 开始。首次使用时创建该文件，后续版本在文件顶部插入新版本条目。
 
 ---
 
 #### 🔒 门禁 3：计划确认
 
-以下全部通过后，方可进入阶段 4：
+以下全部通过后，方可交付给交付Agent：
 
 - [ ] Goal → Epic → Story 拆分已完成，层级关系清晰可读
 - [ ] 每个 Story 有：复杂度估算、依赖标注、验收标准（GWT）、影响范围（场景编号+测试用例编号）
@@ -275,9 +345,12 @@ Plan 文件输出完成后，为本次迭代涉及的所有 Release Version 创�
 - [ ] Plan 文件已按版本输出到 `plan/to-do/v{N}/`，命名格式正确
 - [ ] `versions/roadmap.md` 已更新（新版本条目已插入文件顶部）
 - [ ] `versions/v{x.y.z}.md` 已为每个 Release Version 创建
+- [ ] `requirements/requirements.md` 已更新（本次版本条目已插入文件顶部）
+- [ ] `requirements/scenario.md` 已更新（本次版本场景已汇总，编号连续）
+- [ ] 本次选取的 backlog 文件 `status` 均已更新为 `planned`
 - [ ] 测试用例覆盖范围已由 QA Agent 确认
 - [ ] 用户已确认拆分方案、版本划分、版本号和路线图
 
 ---
 
-门禁 3 全部通过后，Plan 文件已就绪（写入 `plan/to-do/v{N}/`）。交付Agent 可随时从此队列拉取版本计划，进入「版本实施与移交」（见 `../deliverer/implementation.md` 标准通道入口）。规划Agent 可在独立会话中继续准备下一版本。
+门禁 3 全部通过后，Plan 文件已就绪（写入 `plan/to-do/v{N}/`），`requirements/requirements.md` 和 `requirements/scenario.md` 已更新。交付Agent 可随时从此队列拉取版本计划，进入「版本实施与移交」（见 `../agent-deliverer/implementation.md` 标准通道入口）。规划Agent 可在独立会话中继续准备下一版本。
